@@ -1,0 +1,42 @@
+# cluster.yaml
+
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: doc-cluster
+  version: "1.29"
+  region: ap-northeast-2
+
+vpc:
+  subnets:
+    public:
+      public-a: { id: subnet-03b0af6836130ebea }
+      public-b: { id: subnet-09fd378a7e5f5c8a4 }
+    private:
+      private-a: { id: subnet-04b9dfeceb6e602f1 }
+      private-b: { id: subnet-07f1344a13ebff813 }
+
+managedNodeGroups:
+  - name: eks-worker
+    labels: { role: apps }
+    instanceType: t3.medium
+    instanceName: eks-worker
+    desiredCapacity: 2
+    minSize: 2
+    maxSize: 20
+    privateNetworking: true
+    volumeType: gp2
+    volumeEncrypted: true
+    subnets:
+      - private-a
+      - private-b
+    tags:
+      k8s.io/cluster-autoscaler/enabled: "true"
+      k8s.io/cluster-autoscaler/doc-cluster: "owned"
+    iam:
+      withAddonPolicies:
+        imageBuilder: true
+        externalDNS: true
+        certManager: true
+        awsLoadBalancerController: true

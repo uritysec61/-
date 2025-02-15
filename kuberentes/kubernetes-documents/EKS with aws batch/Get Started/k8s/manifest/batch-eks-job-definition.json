@@ -1,0 +1,25 @@
+{
+    "jobDefinitionName": "batch-job-definition",
+    "type": "container",
+    "eksProperties": {
+      "podProperties": {
+        "hostNetwork": true,
+        "containers": [
+          {
+            "image": "public.ecr.aws/amazonlinux/amazonlinux:2",
+            "command": [
+              "/bin/sh", 
+              "-c", 
+              "echo 'hello world'; sleep 20"
+            ],
+            "resources": {
+              "limits": {
+                "cpu": "1",
+                "memory": "1024Mi"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }

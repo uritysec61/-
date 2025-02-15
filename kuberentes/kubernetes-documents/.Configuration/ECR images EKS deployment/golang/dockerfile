@@ -1,0 +1,19 @@
+# Build stage
+FROM golang:1.20-alpine AS build
+
+WORKDIR /source
+
+COPY . ./
+
+RUN go mod tidy \
+ && go mod download \
+ && go build -o ./main
+
+# Runtime stage
+FROM scratch
+
+WORKDIR /app
+
+COPY --from=build /source/main ./
+
+ENTRYPOINT ["./main"]

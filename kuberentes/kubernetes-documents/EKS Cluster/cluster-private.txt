@@ -1,0 +1,1 @@
+eksctl utils update-cluster-vpc-config --cluster="cluster Name" --region=ap-northeast-2 --private-access=true --public-access=false --approve

@@ -1,0 +1,42 @@
+# cluster.yaml
+
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: wsi-cluster
+  version: "1.29"
+  region: ap-northeast-2
+
+vpc:
+  subnets:
+    public:
+      public-a: { id: subnet-05d1accba0c56a732 }
+      public-b: { id: subnet-0f6953610abc67415 }
+    private:
+      private-a: { id: subnet-0a1c0e1fef4a3299a }
+      private-b: { id: subnet-09312b52c58b10171 }
+
+managedNodeGroups:
+  - name: wsi-worker
+    labels: { role: apps }
+    instanceType: t3.medium
+    instanceName: wsi-worker
+    desiredCapacity: 2
+    minSize: 2
+    maxSize: 20
+    privateNetworking: true
+    volumeType: gp2
+    volumeEncrypted: true
+    subnets:
+      - private-a
+      - private-b
+    tags:
+      k8s.io/cluster-autoscaler/enabled: "true"
+      k8s.io/cluster-autoscaler/doc-cluster: "owned"
+    iam:
+      withAddonPolicies:
+        imageBuilder: true
+        externalDNS: true
+        certManager: true
+        awsLoadBalancerController: true

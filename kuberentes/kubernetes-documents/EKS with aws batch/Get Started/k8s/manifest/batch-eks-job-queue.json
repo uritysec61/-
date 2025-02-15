@@ -1,0 +1,10 @@
+{
+    "jobQueueName": "batch-job-queue",
+    "priority": 10,
+    "computeEnvironmentOrder": [
+      {
+        "order": 1,
+        "computeEnvironment": "batch-compute-env"
+      }
+    ]
+  }

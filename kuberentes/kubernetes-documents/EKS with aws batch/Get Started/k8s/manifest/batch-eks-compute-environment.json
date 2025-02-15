@@ -1,0 +1,26 @@
+{
+    "computeEnvironmentName": "batch-compute-env",
+    "type": "MANAGED",
+    "state": "ENABLED",
+    "eksConfiguration": {
+      "eksClusterArn": "arn:aws:eks:ap-northeast-2:226347592148:cluster/batch4eks-cluster2",
+      "kubernetesNamespace": "batch"
+    },
+    "computeResources": {
+      "type": "EC2",
+      "allocationStrategy": "BEST_FIT_PROGRESSIVE",
+      "minvCpus": 0,
+      "maxvCpus": 128,
+      "instanceTypes": [
+          "optimal" 
+      ],
+      "subnets": [
+          "subnet-0399adce08310f5d0",
+          "subnet-09118efb5eb7176e6"
+      ],
+      "securityGroupIds": [
+          "sg-025f08dde588196fc"
+      ],
+      "instanceRole": "arn:aws:iam::226347592148:instance-profile/AmazonEKSNodeRole"
+    }
+  }

@@ -1,0 +1,15 @@
+## Service.yaml ##
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: wsi
+  namespace: skills 
+spec:
+  type: NodePort 
+  selector:
+    app: wsi
+  ports:
+    - port: 8080 # 서비스가 생성할 포트  
+      targetPort: 8080 # 서비스가 접근할 pod의 포트
+      protocol: TCP

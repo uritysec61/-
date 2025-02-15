@@ -1,0 +1,9 @@
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: default
+  namespace: istio-system
+spec:
+  mtls:
+    mode: STRICT # istio가 관리하지 않는 namespace에서 접근 시 모두 차단 (mTLS 미 사용시 차단)
+    #mode: PERMISSIVE # istio가 관리하지 않는 namespace에서 접근 시 접근 허용 (mTLS 미 사용시에도 접근이 허용)

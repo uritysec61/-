@@ -1,0 +1,85 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: istio-eks-cluster-1
+  version: "1.31"
+  region: ap-northeast-3
+
+vpc:
+  id: "vpc-07915d10a9690699e"
+  subnets:
+    private:
+      ap-northeast-3a:
+          id: "subnet-047dff3e5f3ab9fcd"
+      ap-northeast-3b:
+          id: "subnet-0d643d670c498fcfd"
+    public:
+      ap-northeast-3a:
+          id: "subnet-0bad6743479af7cd3"
+      ap-northeast-3b:
+          id: "subnet-0aaaab48db71bcce2"  
+
+# iamIdentityMappings: # aws-auth
+#   - arn: arn:aws:iam::226347592148:user/root
+#     groups:
+#       - system:masters
+#     username: root-admin
+#     noDuplicateARNs: true
+
+iam:
+  withOIDC: true
+  serviceAccounts:
+  - metadata:
+      name: aws-load-balancer-controller
+      namespace: kube-system
+    wellKnownPolicies:
+      awsLoadBalancerController: true
+  podIdentityAssociations:
+  - namespace: "kube-system"
+    serviceAccountName: ebs-csi-controller-sa
+    roleName: AmazonEBSCSIDriverRole
+    permissionPolicyARNs:
+    - arn:aws:iam::aws:policy/AdministratorAccess
+
+managedNodeGroups:
+  - name: istio-node-1
+    labels: { app: nga }
+    instanceType: t3.medium
+    instanceName: app-node
+    desiredCapacity: 2
+    minSize: 1
+    maxSize: 20
+    amiFamily: Bottlerocket
+    privateNetworking: true
+    volumeType: gp2
+    volumeEncrypted: true
+    iam:
+      withAddonPolicies:
+        imageBuilder: true
+        awsLoadBalancerController: true
+        autoScaler: true
+
+  - name: istio-node-spire-1
+    labels: { dedicated: spire-server }
+    instanceType: t3.medium
+    instanceName: app-node-spire
+    desiredCapacity: 1
+    minSize: 1
+    maxSize: 1
+    taints:
+      - key: dedicated
+        value: "spire-server"
+        effect: NoExecute
+    amiFamily: Bottlerocket
+    privateNetworking: true
+    volumeType: gp2
+    volumeEncrypted: true
+    iam:
+      withAddonPolicies:
+        imageBuilder: true
+        awsLoadBalancerController: true
+        autoScaler: true
+
+addon:
+- name: eks-pod-identity-agent

@@ -1,0 +1,22 @@
+## deployment.yaml ##
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wsi-deployment
+  namespace: skills         ## 여기서 webapp을 하고 배포를 하면 fargate으로 생성됨. 
+  labels:
+    app: wsi
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: wsi
+  template:
+    metadata:
+      labels:
+        app: wsi
+    spec:
+      containers:
+        - name: wsi
+          image: 226347592148.dkr.ecr.ap-northeast-2.amazonaws.com/wsi-repo:latest

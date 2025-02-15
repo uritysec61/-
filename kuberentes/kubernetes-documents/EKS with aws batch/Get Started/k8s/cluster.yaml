@@ -1,0 +1,69 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: batch4eks-cluster2
+  version: "1.31"
+  region: ap-northeast-2
+
+vpc:
+  subnets:
+    public:
+      public-a: { id: subnet-00da28c0a199f04a9 }
+      public-b: { id: subnet-05e0ded6fe80e1687 }
+    private:
+      private-a: { id: subnet-0399adce08310f5d0 }
+      private-b: { id: subnet-09118efb5eb7176e6 }
+
+accessConfig:
+  authenticationMode: API_AND_CONFIG_MAP
+  accessEntries:
+    - principalARN: arn:aws:iam::226347592148:root
+      accessPolicies:
+        - policyARN: arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy
+          accessScope:
+            type: cluster
+
+iamIdentityMappings:
+  - arn: arn:aws:iam::226347592148:role/root
+    groups:
+      - system:masters
+    username: admin
+    noDuplicateARNs: true # prevents shadowing of ARNs
+
+iam:
+  withOIDC: true
+  serviceAccounts:
+  - metadata: 
+      name: amazon-cloudwatch-observability
+      namespace: amazon-cloudwatch
+      labels: 
+        aws-usage: "observability"
+    attachPolicyARNs:
+      - arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess
+      - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
+    roleName: batch4eks-cluster2-amazon-cloudwatch-observability-role
+    roleOnly: true
+
+managedNodeGroups:
+  - name: batch4eks-app-ng
+    labels: { role: apps }
+    instanceType: t3.medium
+    instanceName: batch4eks-app-ng
+    desiredCapacity: 2
+    minSize: 2
+    maxSize: 20
+    privateNetworking: true
+    volumeType: gp3
+    volumeEncrypted: true
+    subnets:
+      - private-a
+      - private-b
+
+addons:
+- name: amazon-cloudwatch-observability
+  version: latest
+  attachPolicyARNs:
+    - arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess
+    - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
+  configurationValues: "{\"tolerations\": [{\"key\": \"batch.amazonaws.com/batch-node\",  \"operator\": \"Exists\" }]}"

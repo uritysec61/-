@@ -1,0 +1,36 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: namespaces-labels
+spec:
+  validationFailureAction: enforce
+  rules:
+  - name: prod-namespaces-labels
+    match:
+      resources:
+        kinds:
+        - Pod
+        - Deployment
+        namespaces:
+        - prod
+    validate:
+      message: "label 'cloudhrdk.com/env' is not passed"
+      pattern:
+        metadata:
+          labels:
+            cloudhrdk.com/env: "prod"
+
+  - name: beta-namespaces-labels
+    match:
+      resources:
+        kinds:
+        - Pod
+        - Deployment
+        namespaces:
+        - beta
+    validate:
+      message: "label 'cloudhrdk.com/env' is not passed"
+      pattern:
+        metadata:
+          labels:
+            cloudhrdk.com/env: "beta"

@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: skills
+  namespace: wsi
+  labels:
+    app: skills
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: skills
+  template:
+    metadata:
+      labels:
+        app: skills
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - db
+      containers:
+        - name: skills-container
+          image: 226347592148.dkr.ecr.ap-northeast-2.amazonaws.com/skills:latest
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sleep", "20"]
+          livenessProbe:
+            httpGet:
+              path: /healthcheck
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: 250m
+              memory: 500Mi
+      restartPolicy: Always

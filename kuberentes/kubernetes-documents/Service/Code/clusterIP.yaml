@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: skills-service
+  namespace: wsc-prod
+spec:
+  type: ClusterIP
+  selector:
+    app: skills
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
